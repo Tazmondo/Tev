@@ -1,6 +1,6 @@
 [package]
-name = "tazmondo/red"
-version = "3.0.0"
+name = "tazmondo/blue"
+version = "1.0.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 license = "MIT"
