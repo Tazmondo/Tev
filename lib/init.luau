@@ -33,7 +33,12 @@ local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -
 		assert(RunService:IsServer(), "Tried to listen to a client event from the client.")
 		assert(callback == nil, "Tried to listen to event more than once.")
 
-		event.OnServerEvent:Connect(callback)
+		event.OnServerEvent:Connect(function(...)
+			local success = pcall(guard, ...)
+			if success then
+				callback(...)
+			end
+		end)
 	end
 
 	return {
@@ -92,10 +97,10 @@ local function Server<T...>(id: string, reliable: boolean, guard: (...unknown) -
 		end
 	end
 
-	local function On(self: ServerEvent<T...>, newCallback: (T...) -> ())
+	local function On(self: ServerEvent<T...>, callback: (T...) -> ())
 		assert(RunService:IsClient(), "Tried to listen to a server event from the server.")
 
-		event.OnClientEvent:Connect(newCallback)
+		event.OnClientEvent:Connect(callback)
 	end
 
 	return {
