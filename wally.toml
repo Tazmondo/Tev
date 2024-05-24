@@ -1,0 +1,16 @@
+[package]
+name = "tazmondo/red"
+version = "3.0.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+license = "MIT"
+exclude = ["**"]
+include = [
+	"default.project.json",
+	"lib",
+	"lib/**",
+	"wally.toml",
+	"README.md",
+]
+
+[dependencies]

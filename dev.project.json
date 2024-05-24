@@ -1,0 +1,23 @@
+{
+	"name": "RedDev",
+	"tree": {
+		"$className": "DataModel",
+		"ServerScriptService": {
+			"$path": "Test/Server"
+		},
+		"ReplicatedStorage": {
+			"$path": "Test/Shared",
+			"Packages": {
+				"$path": "Packages",
+				"Red": {
+					"$path": "lib"
+				}
+			}
+		},
+		"StarterPlayer": {
+			"StarterPlayerScripts": {
+				"$path": "Test/Client"
+			}
+		}
+	}
+}
