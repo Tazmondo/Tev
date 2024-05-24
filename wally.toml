@@ -14,3 +14,4 @@ include = [
 ]
 
 [dependencies]
+Future = "tazmondo/future@2.0.1"
