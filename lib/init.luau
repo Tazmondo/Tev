@@ -31,12 +31,11 @@ local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -
 
 	local function On(self: ClientEvent<T...>, callback: (Player, T...) -> ())
 		assert(RunService:IsServer(), "Tried to listen to a client event from the client.")
-		assert(callback == nil, "Tried to listen to event more than once.")
 
-		event.OnServerEvent:Connect(function(...)
+		event.OnServerEvent:Connect(function(player, ...)
 			local success, err = (pcall :: any)(guard, ...)
 			if success then
-				callback(...)
+				callback(player, ...)
 			elseif RunService:IsStudio() then
 				-- you probably want to be notified if this happens in studio
 				-- but we don't want exploiters spamming warnings in live game
