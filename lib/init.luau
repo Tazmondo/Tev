@@ -3,8 +3,6 @@ local RunService = game:GetService("RunService")
 
 local Event = require(script.Event)
 type ServerEvent<T...> = {
-	Reliable: boolean,
-
 	Fire: (self: ServerEvent<T...>, Player | { Player }, T...) -> (),
 	FireAll: (self: ServerEvent<T...>, T...) -> (),
 	FireAllExcept: (self: ServerEvent<T...>, Player, T...) -> (),
@@ -14,8 +12,6 @@ type ServerEvent<T...> = {
 }
 
 type ClientEvent<T...> = {
-	Reliable: boolean,
-
 	Fire: (self: ClientEvent<T...>, T...) -> (),
 
 	On: (self: ClientEvent<T...>, callback: (Player, T...) -> ()) -> (),
@@ -45,8 +41,6 @@ local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -
 	end
 
 	return {
-		Reliable = reliable,
-
 		Fire = Fire,
 		On = On,
 	}
@@ -107,8 +101,6 @@ local function Server<T...>(id: string, reliable: boolean, guard: (...unknown) -
 	end
 
 	return {
-		Reliable = reliable,
-
 		Fire = Fire,
 		FireAll = FireAll,
 		FireAllExcept = FireAllExcept,
