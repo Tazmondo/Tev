@@ -15,3 +15,4 @@ include = [
 
 [dependencies]
 Future = "tazmondo/future@2.0.1"
+Guard = "red-blox/guard@1.0.0"
