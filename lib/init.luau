@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+
+local Event = require(script.Event)
 type ServerEvent<T...> = {
 	Reliable: boolean,
 
@@ -8,7 +10,7 @@ type ServerEvent<T...> = {
 	FireAllExcept: (self: ServerEvent<T...>, Player, T...) -> (),
 	FireFiltered: (self: ServerEvent<T...>, Filter: (Player) -> boolean, T...) -> (),
 
-	On: (self: ServerEvent<T...>, T...) -> (),
+	On: (self: ServerEvent<T...>, callback: (T...) -> ()) -> (),
 }
 
 type ClientEvent<T...> = {
@@ -16,16 +18,22 @@ type ClientEvent<T...> = {
 
 	Fire: (self: ClientEvent<T...>, T...) -> (),
 
-	On: (self: ClientEvent<T...>, Player, T...) -> (),
+	On: (self: ClientEvent<T...>, callback: (Player, T...) -> ()) -> (),
 }
 
 local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -> T...): ClientEvent<T...>
-	local function Fire(self: ClientEvent<T...>, ...: T...)
+	local event = Event(id, reliable)
+
+	local function Fire(self: ClientEvent<T...>, ...)
 		assert(RunService:IsClient(), "Tried to fire a client event from the server.")
+		event:FireServer(...)
 	end
 
-	local function On(self: ClientEvent<T...>, player: Player, ...: T...)
+	local function On(self: ClientEvent<T...>, callback: (Player, T...) -> ())
 		assert(RunService:IsServer(), "Tried to listen to a client event from the client.")
+		assert(callback == nil, "Tried to listen to event more than once.")
+
+		event.OnServerEvent:Connect(callback)
 	end
 
 	return {
@@ -45,40 +53,49 @@ local function UnreliableClient<T...>(id: string, guard: (...unknown) -> T...): 
 end
 
 local function Server<T...>(id: string, reliable: boolean, guard: (...unknown) -> T...): ServerEvent<T...>
-	local function Fire(self: ServerEvent<T...>, player: Player | { Player }, ...: T...)
-		assert(RunService:IsServer(), "Tried to fire a server event from the client.")
-	end
+	local event = Event(id, reliable)
 
-	local function FireAll(self: ServerEvent<T...>, ...: T...)
+	local function Fire(self: ServerEvent<T...>, player: Player | { Player }, ...)
 		assert(RunService:IsServer(), "Tried to fire a server event from the client.")
-
-		for _, player in Players:GetPlayers() do
-			self:Fire(player, ...)
+		if typeof(player) == "Instance" then
+			event:FireClient(player, ...)
+		else
+			for _, player in player do
+				event:FireClient(player, ...)
+			end
 		end
 	end
 
-	local function FireAllExcept(self: ServerEvent<T...>, excludedPlayer: Player, ...: T...)
+	local function FireAll(self: ServerEvent<T...>, ...)
+		assert(RunService:IsServer(), "Tried to fire a server event from the client.")
+
+		event:FireAllClients(...)
+	end
+
+	local function FireAllExcept(self: ServerEvent<T...>, excludedPlayer: Player, ...)
 		assert(RunService:IsServer(), "Tried to fire a server event from the client.")
 
 		for _, player in Players:GetPlayers() do
 			if player ~= excludedPlayer then
-				self:Fire(player, ...)
+				event:FireClient(player, ...)
 			end
 		end
 	end
 
-	local function FireFiltered(self: ServerEvent<T...>, filter: (Player) -> boolean, ...: T...)
+	local function FireFiltered(self: ServerEvent<T...>, filter: (Player) -> boolean, ...)
 		assert(RunService:IsServer(), "Tried to fire a server event from the client.")
 
 		for _, player in Players:GetPlayers() do
 			if filter(player) then
-				self:Fire(player, ...)
+				event:FireClient(player, ...)
 			end
 		end
 	end
 
-	local function On(self: ServerEvent<T...>, ...: T...)
+	local function On(self: ServerEvent<T...>, newCallback: (T...) -> ())
 		assert(RunService:IsClient(), "Tried to listen to a server event from the server.")
+
+		event.OnClientEvent:Connect(newCallback)
 	end
 
 	return {
