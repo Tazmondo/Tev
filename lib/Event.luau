@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 
-local function CreateEvent(reliable: boolean)
+local function CreateEvent(reliable: boolean): RemoteEvent | UnreliableRemoteEvent
 	if reliable then
 		return Instance.new("RemoteEvent")
 	else
@@ -14,7 +14,7 @@ local function new(id: string, reliable: boolean): RemoteEvent
 			error(`Two events had the same id: {id}`)
 		end
 
-		local event = CreateEvent(reliable)
+		local event = CreateEvent(reliable) :: RemoteEvent -- cast to fix unassignable union property bug
 		event.Name = id
 		event.Parent = script
 

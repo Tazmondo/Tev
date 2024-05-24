@@ -34,9 +34,13 @@ local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -
 		assert(callback == nil, "Tried to listen to event more than once.")
 
 		event.OnServerEvent:Connect(function(...)
-			local success = pcall(guard, ...)
+			local success, err = (pcall :: any)(guard, ...)
 			if success then
 				callback(...)
+			elseif RunService:IsStudio() then
+				-- you probably want to be notified if this happens in studio
+				-- but we don't want exploiters spamming warnings in live game
+				warn("Received invalid arguments from event with id", id, "error:", err)
 			end
 		end)
 	end
