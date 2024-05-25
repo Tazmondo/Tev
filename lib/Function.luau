@@ -1,13 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local RemoteEvent = require(ReplicatedStorage.Packages.Blue.RemoteEvent)
 local Future = require(ReplicatedStorage.Packages.Future)
-local Event = require(script.Parent.Event)
 
 export type Function<R, T...> = {
-	Invoke: (self: Function<R, T...>, player: Player, T...) -> Future.Future<Future.TablePcall<R>>,
+	Invoke: (self: Function<R, T...>, T...) -> Future.Future<Future.TablePcall<R>>,
 
-	On: (self: Function<R, T...>, callback: (T...) -> R) -> (),
+	On: (self: Function<R, T...>, callback: (Player, T...) -> R) -> (),
 }
 
 local function Trace(err)
@@ -17,73 +17,67 @@ local function Trace(err)
 	return trace
 end
 
-local function Function<R, T...>(id: string, guard: (...unknown) -> T..., returnGuard: (unknown) -> R): Function<R, T...>
-	local event = Event(id, true)
+local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., returnGuard: (unknown) -> R)
+	local event = RemoteEvent(id, true)
+	local requestId = 1
 
-	local pendingRequests: { [Player]: { thread }? } = {}
-	if RunService:IsServer() then
-		event.OnServerEvent:Connect(function(player, returnValue)
-			local pending = pendingRequests[player]
-			if not pending or #pending == 0 then
-				return
+	local pending: { [number]: thread } = {}
+
+	if RunService:IsClient() then
+		event.OnClientEvent:Connect(function(id: number, success: boolean, returnValue: Future.TablePcall<R>)
+			local pendingThread = pending[id]
+			if not pendingThread then
+				error("Pending thread was not found?")
 			end
 
-			local calledThread = table.remove(pending, 1)
-			assert(calledThread)
-
-			if #pending == 0 then
-				pendingRequests[player] = nil
-			end
-
-			task.spawn(calledThread, returnValue)
+			pending[id] = nil
+			task.spawn(pendingThread, returnValue)
 		end)
 	end
 
-	local function Invoke(self: Function<R, T...>, player: Player, ...: T...)
-		assert(RunService:IsServer(), "Tried to invoke remote function from the client.")
+	local function Invoke(...: T...)
+		return Future.new(function(...)
+			event:FireServer(requestId, ...)
+			pending[requestId] = coroutine.running()
+			requestId += 1
 
-		return Future.Try(function(player, ...)
-			local existing = pendingRequests[player] or {} :: { thread }
-			local currentThread = coroutine.running()
-			table.insert(existing, currentThread)
-			pendingRequests[player] = existing
+			local retValue: Future.TablePcall<R> = coroutine.yield()
 
-			local cancel = false
-
-			local delayThread = task.delay(5, function()
-				-- after 30 seconds, cancel
-				cancel = true
-				for i, thread in existing do
-					if thread == currentThread then
-						table.remove(existing, i)
-						task.spawn(thread, nil)
-						break
-					end
-				end
-			end)
-
-			event:FireClient(player, ...)
-
-			local value = coroutine.yield()
-			if cancel then
-				error("Remote Function timed out")
-			else
-				task.cancel(delayThread)
-			end
-			returnGuard(value)
-
-			return value
-		end, player, ...)
+			return retValue
+		end, ...)
 	end
 
-	local function On(self: Function<R, T...>, callback: (T...) -> R)
-		assert(RunService:IsClient(), "Tried to listen to remote function from the server.")
-		event.OnClientEvent:Connect(function(...)
-			local success, result = xpcall(callback, Trace, ...)
-			if success then
-				event:FireServer(result)
+	local function On(callback: (Player, T...) -> R)
+		event.OnServerEvent:Connect(function(player, id: unknown, ...)
+			if not typeof(id == "number") then
+				if RunService:IsStudio() then
+					error("Did not receive valid request id")
+				end
+				return
+			end
+
+			local guardSuccess, err = (pcall :: any)(guard, ...)
+			if not guardSuccess then
+				event:FireClient(player, id, {
+					success = false,
+					value = err,
+				})
+				return
+			end
+
+			local callbackSuccess, value = xpcall(callback, Trace, ...)
+			if not callbackSuccess then
+				event:FireClient(player, id, {
+					success = false,
+					value = "Unexpected Server Error",
+				})
+				return
 			else
-				event:FireServer()
+				event:FireClient(player, id, {
+					success = true,
+					value = value,
+				})
+				return
 			end
 		end)
 	end
@@ -94,4 +88,4 @@ local function Function<R, T...>(id: string, guard: (...unknown) -> T..., return
 	}
 end
 
-return Function
+return ServerFunction

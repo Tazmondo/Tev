@@ -1,25 +1,26 @@
-local Client = require(script.Client)
-local Function = require(script.Function)
-local Server = require(script.Server)
+local ClientEvent = require(script.Events.Client)
+local ServerEvent = require(script.Events.Server)
 
-export type ServerEvent<T...> = Server.ServerEvent<T...>
-export type ClientEvent<T...> = Client.ClientEvent<T...>
+local Function = require(script.Function)
+
+export type ServerEvent<T...> = ServerEvent.ServerEvent<T...>
+export type ClientEvent<T...> = ClientEvent.ClientEvent<T...>
 export type Function<R, T...> = Function.Function<R, T...>
 
 local function ReliableClient<T...>(id: string, guard: (...unknown) -> T...)
-	return Client(id, true, guard)
+	return ClientEvent(id, true, guard)
 end
 
 local function UnreliableClient<T...>(id: string, guard: (...unknown) -> T...)
-	return Client(id, false, guard)
+	return ClientEvent(id, false, guard)
 end
 
 local function ReliableServer<T...>(id: string, guard: (...unknown) -> T...)
-	return Server(id, true, guard)
+	return ServerEvent(id, true, guard)
 end
 
 local function UnreliableServer<T...>(id: string, guard: (...unknown) -> T...)
-	return Server(id, false, guard)
+	return ServerEvent(id, false, guard)
 end
 
 return {

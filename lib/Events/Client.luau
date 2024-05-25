@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 
-local Event = require(script.Parent.Event)
+local Event = require(script.Parent.Parent.RemoteEvent)
 
 export type ClientEvent<T...> = {
 	Fire: (self: ClientEvent<T...>, T...) -> (),
