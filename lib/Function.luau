@@ -1,8 +1,7 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local RemoteEvent = require(ReplicatedStorage.Packages.Blue.RemoteEvent)
-local Future = require(ReplicatedStorage.Packages.Future)
+local RemoteEvent = require(script.Parent.RemoteEvent)
+local Future = require(script.Parent.Parent.Future)
 
 export type Function<R, T...> = {
 	Invoke: (self: Function<R, T...>, T...) -> Future.Future<Future.TablePcall<R>>,
