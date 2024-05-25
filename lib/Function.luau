@@ -17,7 +17,7 @@ local function Trace(err)
 	return trace
 end
 
-local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., returnGuard: (unknown) -> R)
+local function Function<R, T...>(id: string, guard: (...unknown) -> T..., returnGuard: (unknown) -> R): Function<R, T...>
 	local event = RemoteEvent(id, true)
 	local requestId = 1
 
@@ -26,7 +26,7 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 	local pending: { [number]: thread } = {}
 
 	if RunService:IsClient() then
-		event.OnClientEvent:Connect(function(id: number, success: boolean, returnValue: Future.TablePcall<R>)
+		event.OnClientEvent:Connect(function(id: number, returnValue: Future.TablePcall<R>)
 			local pendingThread = pending[id]
 			if not pendingThread then
 				error("Pending thread was not found?")
@@ -37,7 +37,7 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 		end)
 	end
 
-	local function Invoke(...: T...)
+	local function Invoke(self: Function<R, T...>, ...: T...)
 		assert(RunService:IsClient(), "Tried to invoke remote function from server.")
 
 		return Future.new(function(...)
@@ -51,7 +51,7 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 		end, ...)
 	end
 
-	local function On(callback: (Player, T...) -> R)
+	local function On(self: Function<R, T...>, callback: (Player, T...) -> R)
 		assert(RunService:IsServer(), "Tried to register remote function handler on client.")
 		assert(not connected, "Tried to connect two listeners to remote function.")
 
@@ -97,4 +97,4 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 	}
 end
 
-return ServerFunction
+return Function
