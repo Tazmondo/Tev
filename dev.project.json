@@ -1,5 +1,5 @@
 {
-	"name": "BlueDev",
+	"name": "TevDev",
 	"tree": {
 		"$className": "DataModel",
 		"ServerScriptService": {
@@ -9,7 +9,7 @@
 			"$path": "Test/Shared",
 			"Packages": {
 				"$path": "Packages",
-				"Blue": {
+				"Tev": {
 					"$path": "lib"
 				}
 			}

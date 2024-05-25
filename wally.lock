@@ -8,11 +8,11 @@ version = "1.0.1"
 dependencies = []
 
 [[package]]
-name = "tazmondo/blue"
-version = "1.0.0"
-dependencies = [["Future", "tazmondo/future@2.0.1"], ["Guard", "red-blox/guard@1.0.1"]]
+name = "tazmondo/future"
+version = "2.0.2"
+dependencies = []
 
 [[package]]
-name = "tazmondo/future"
-version = "2.0.1"
-dependencies = []
+name = "tazmondo/tev"
+version = "1.0.1"
+dependencies = [["Future", "tazmondo/future@2.0.2"], ["Guard", "red-blox/guard@1.0.1"]]

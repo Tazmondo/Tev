@@ -12,7 +12,7 @@ export type Function<R, T...> = {
 local function Trace(err)
 	-- Return at 2nd level so the traceback starts at the function, not here.
 	local trace = debug.traceback(err, 2)
-	warn(`Blue Function error: {trace}`)
+	warn(`Tev Function error: {trace}`)
 	return trace
 end
 
