@@ -10,6 +10,7 @@ export type ClientEvent<T...> = {
 
 local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -> T...): ClientEvent<T...>
 	local event = Event(id, reliable)
+	local connected = false
 
 	local function Fire(self: ClientEvent<T...>, ...)
 		assert(RunService:IsClient(), "Tried to fire a client event from the server.")
@@ -18,6 +19,9 @@ local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -
 
 	local function On(self: ClientEvent<T...>, callback: (Player, T...) -> ())
 		assert(RunService:IsServer(), "Tried to listen to a client event from the client.")
+		assert(not connected, "Tried to listen to a client event more than once.")
+
+		connected = true
 
 		event.OnServerEvent:Connect(function(player, ...)
 			local success, err = (pcall :: any)(guard, ...)

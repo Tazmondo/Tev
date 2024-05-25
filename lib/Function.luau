@@ -21,6 +21,8 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 	local event = RemoteEvent(id, true)
 	local requestId = 1
 
+	local connected = false
+
 	local pending: { [number]: thread } = {}
 
 	if RunService:IsClient() then
@@ -51,6 +53,9 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 
 	local function On(callback: (Player, T...) -> R)
 		assert(RunService:IsServer(), "Tried to register remote function handler on client.")
+		assert(not connected, "Tried to connect two listeners to remote function.")
+
+		connected = true
 
 		event.OnServerEvent:Connect(function(player, id: unknown, ...)
 			if not typeof(id == "number") then
