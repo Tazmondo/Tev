@@ -23,8 +23,8 @@ return {
 	end),
 
 	func = Blue.Function("func", function(a1, a2)
-		return a1 :: number, a2 :: string
+		return Guard.Number(a1), Guard.String(a2)
 	end, function(a3)
-		return Guard.CFrame(a3)
+		return a3 :: CFrame
 	end),
 }

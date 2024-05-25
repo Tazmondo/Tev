@@ -1,5 +1,4 @@
 --!strict
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local events = require(ReplicatedStorage.events)
@@ -21,5 +20,10 @@ events.tabargument:FireAll({
 	wow = 1004,
 })
 
-print("Invoking...")
-print(events.func:Invoke(Players:GetPlayers()[1], 5, "lol"):Await())
+events.func:On(function(plr, num, stri)
+	if Random.new():NextInteger(1, 2) == 2 then
+		error("oh noooo")
+	end
+	task.wait(Random.new():NextNumber(1, 3))
+	return CFrame.new()
+end)
