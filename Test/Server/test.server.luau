@@ -1,4 +1,5 @@
 --!strict
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local events = require(ReplicatedStorage.events)
@@ -19,3 +20,6 @@ events.tabargument:FireAll({
 	loo = "dddd",
 	wow = 1004,
 })
+
+print("Invoking...")
+print(events.func:Invoke(Players:GetPlayers()[1], 5, "lol"):Await())

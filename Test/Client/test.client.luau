@@ -8,10 +8,15 @@ local function printer(prefix: string)
 	end
 end
 
-task.wait(5)
+task.wait(1)
 events.tabargument:On(printer("tabarguments"))
 events.serverarguments:On(printer("serverarguments"))
 events.empty:On(printer("empty"))
 
 events.loaded:Fire()
 events.clientarguments:Fire(123, CFrame.new(), "aaa")
+
+events.func:On(function(a, b)
+	error("oh no!")
+	return CFrame.new(1, 2, 3)
+end)

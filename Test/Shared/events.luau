@@ -21,4 +21,10 @@ return {
 			loo: string,
 		}
 	end),
+
+	func = Blue.Function("func", function(a1, a2)
+		return a1 :: number, a2 :: string
+	end, function(a3)
+		return Guard.CFrame(a3)
+	end),
 }
