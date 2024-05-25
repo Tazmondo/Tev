@@ -36,6 +36,8 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 	end
 
 	local function Invoke(...: T...)
+		assert(RunService:IsClient(), "Tried to invoke remote function from server.")
+
 		return Future.new(function(...)
 			event:FireServer(requestId, ...)
 			pending[requestId] = coroutine.running()
@@ -48,6 +50,8 @@ local function ServerFunction<R, T...>(id: string, guard: (...unknown) -> T..., 
 	end
 
 	local function On(callback: (Player, T...) -> R)
+		assert(RunService:IsServer(), "Tried to register remote function handler on client.")
+
 		event.OnServerEvent:Connect(function(player, id: unknown, ...)
 			if not typeof(id == "number") then
 				if RunService:IsStudio() then
