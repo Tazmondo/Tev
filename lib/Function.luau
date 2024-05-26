@@ -57,7 +57,7 @@ local function Function<R, T...>(id: string, guard: (...unknown) -> T..., return
 		connected = true
 
 		event.OnServerEvent:Connect(function(player, id: unknown, ...)
-			if not typeof(id == "number") then
+			if typeof(id) ~= "number" then
 				if RunService:IsStudio() then
 					error("Did not receive valid request id")
 				end
