@@ -47,7 +47,7 @@ local serverEvent = Tev.Server("Unique Event Name", function(arg1, arg2, arg3)
   return arg1 :: number, arg2 :: string, arg3 :: CFrame -- don't necessarily need to use Guard for server events.
 end)
 
-local clientEvent = Tev.Server("Unique Event Name", function(arg1, arg2, arg3)
+local clientEvent = Tev.Client("Unique Event Name", function(arg1, arg2, arg3)
   return Guard.Number(arg1), Guard.String(arg2), Guard.CFrame(arg3) -- should definitely use guard for client events to prevent exploiters sending incorrect types
 end)
 
