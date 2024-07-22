@@ -73,7 +73,7 @@ local function Function<R, T...>(id: string, guard: (...unknown) -> T..., return
 				return
 			end
 
-			local callbackSuccess, value = xpcall(callback, Trace, ...)
+			local callbackSuccess, value = xpcall(callback, Trace, player, ...)
 			if not callbackSuccess then
 				event:FireClient(player, id, {
 					success = false,
