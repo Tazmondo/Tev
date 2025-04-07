@@ -54,8 +54,6 @@ local function Server<T...>(id: string, reliable: boolean, guard: (...unknown) -
 
 	local function On(self: ServerEvent<T...>, callback: (T...) -> ())
 		assert(RunService:IsClient(), "Tried to listen to a server event from the server.")
-		assert(not connected, "Tried to listen to a server event more than once.")
-		connected = true
 
 		event.OnClientEvent:Connect(callback)
 	end

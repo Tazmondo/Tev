@@ -18,9 +18,6 @@ local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -
 
 	local function On(self: ClientEvent<T...>, callback: (Player, T...) -> ())
 		assert(RunService:IsServer(), "Tried to listen to a client event from the client.")
-		assert(not connected, "Tried to listen to a client event more than once.")
-
-		connected = true
 
 		event.OnServerEvent:Connect(function(player, ...)
 			local success, err = (pcall :: any)(guard, ...)
