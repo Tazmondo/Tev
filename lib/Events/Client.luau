@@ -10,15 +10,6 @@ export type ClientEvent<T...> = {
 
 local function Client<T...>(id: string, reliable: boolean, guard: (...unknown) -> T...): ClientEvent<T...>
 	local event = Event(id, reliable)
-	local connected = false
-
-	if RunService:IsServer() then
-		task.delay(10, function()
-			if not connected then
-				warn(`event {id} did not have a listener function set!`)
-			end
-		end)
-	end
 
 	local function Fire(self: ClientEvent<T...>, ...)
 		assert(RunService:IsClient(), "Tried to fire a client event from the server.")
