@@ -10,12 +10,19 @@ end
 
 local function new(id: string, reliable: boolean): RemoteEvent
 	if RunService:IsServer() then
-		if script:FindFirstChild(id) then
-			error(`Two events had the same id: {id}`)
+		local existing = script:FindFirstChild(id)
+		if existing then
+			if not RunService:IsRunning() then
+				error(`Two events had the same id: {id}`)
+			else
+				-- prevents issues with being referenced by plugins like UI labs
+				return existing :: RemoteEvent
+			end
 		end
 
 		local event = CreateEvent(reliable) :: RemoteEvent -- cast to fix unassignable union property bug
 		event.Name = id
+		event.Archivable = false
 		event.Parent = script
 
 		return event
@@ -29,7 +36,7 @@ local function new(id: string, reliable: boolean): RemoteEvent
 			error(`Event with id {id} was not created by the server.`)
 		end
 
-		return event
+		return event :: RemoteEvent
 	end
 end
 
