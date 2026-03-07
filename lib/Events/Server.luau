@@ -15,7 +15,7 @@ export type ServerEvent<T...> = {
 	On: (self: ServerEvent<T...>, callback: (T...) -> ()) -> (),
 }
 
-local function Server<T...>(id: string, reliable: boolean, guard: Guard<T...>): ServerEvent<T...>
+local function Server<T...>(id: string, reliable: boolean, guard: Guard<T...>?): ServerEvent<T...>
 	local event = Event(id, reliable)
 
 	local function Fire(self: ServerEvent<T...>, player: Player | { Player }, ...)
