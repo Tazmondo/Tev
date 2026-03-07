@@ -20,21 +20,31 @@ local function hydrateGuard<T...>(guard: Guard<T...>?): any
 	return guard or function() end
 end
 
+local idCount = 0
+local function getNextId()
+	idCount += 1
+	return tostring(idCount)
+end
+
+local function hydrateId(id: string?): string
+	return id or getNextId()
+end
+
 --We cast  to any as it allows the user to not specify the guard on an API level, and ignores the irrelevant type pack related type issues
-local function ReliableClient<T...>(id: string, guard: Guard<T...>?): ClientEvent<T...>
-	return ClientEvent(id, true, hydrateGuard(guard))
+local function ReliableClient<T...>(id: string?, guard: Guard<T...>?): ClientEvent<T...>
+	return ClientEvent(hydrateId(id), true, hydrateGuard(guard))
 end
 
-local function UnreliableClient<T...>(id: string, guard: Guard<T...>?): ClientEvent<T...>
-	return ClientEvent(id, false, hydrateGuard(guard))
+local function UnreliableClient<T...>(id: string?, guard: Guard<T...>?): ClientEvent<T...>
+	return ClientEvent(hydrateId(id), false, hydrateGuard(guard))
 end
 
-local function ReliableServer<T...>(id: string, guard: Guard<T...>?): ServerEvent<T...>
-	return ServerEvent(id, true, hydrateGuard(guard))
+local function ReliableServer<T...>(id: string?, guard: Guard<T...>?): ServerEvent<T...>
+	return ServerEvent(hydrateId(id), true, hydrateGuard(guard))
 end
 
-local function UnreliableServer<T...>(id: string, guard: Guard<T...>?): ServerEvent<T...>
-	return ServerEvent(id, false, hydrateGuard(guard))
+local function UnreliableServer<T...>(id: string?, guard: Guard<T...>?): ServerEvent<T...>
+	return ServerEvent(hydrateId(id), false, hydrateGuard(guard))
 end
 
 return {
