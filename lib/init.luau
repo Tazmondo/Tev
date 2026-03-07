@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local ClientEvent = require(script.Events.Client)
 local ServerEvent = require(script.Events.Server)
 
@@ -20,14 +21,8 @@ local function hydrateGuard<T...>(guard: Guard<T...>?): any
 	return guard or function() end
 end
 
-local idCount = 0
-local function getNextId()
-	idCount += 1
-	return tostring(idCount)
-end
-
 local function hydrateId(id: string?): string
-	return id or getNextId()
+	return id or HttpService:GenerateGUID()
 end
 
 --We cast  to any as it allows the user to not specify the guard on an API level, and ignores the irrelevant type pack related type issues
