@@ -1,17 +1,11 @@
 [package]
 name = "tazmondo/tev"
-version = "1.1.1"
+version = "1.2.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 license = "MIT"
 exclude = ["**"]
-include = [
-	"default.project.json",
-	"lib",
-	"lib/**",
-	"wally.toml",
-	"README.md",
-]
+include = ["default.project.json", "lib", "lib/**", "wally.toml", "README.md"]
 
 [dependencies]
 Future = "tazmondo/future@2.0.2"
