@@ -2,6 +2,9 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local Event = require(script.Parent.Parent.RemoteEvent)
+local Types = require(script.Parent.Parent.Types)
+
+type Guard<T...> = Types.Guard<T...>
 
 export type ServerEvent<T...> = {
 	Fire: (self: ServerEvent<T...>, Player | { Player }, T...) -> (),
@@ -12,7 +15,7 @@ export type ServerEvent<T...> = {
 	On: (self: ServerEvent<T...>, callback: (T...) -> ()) -> (),
 }
 
-local function Server<T...>(id: string, reliable: boolean, guard: (...unknown) -> T...): ServerEvent<T...>
+local function Server<T...>(id: string, reliable: boolean, guard: Guard<T...>): ServerEvent<T...>
 	local event = Event(id, reliable)
 
 	local function Fire(self: ServerEvent<T...>, player: Player | { Player }, ...)
