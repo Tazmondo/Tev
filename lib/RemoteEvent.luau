@@ -12,7 +12,7 @@ local function new(id: string, reliable: boolean): RemoteEvent
 	if RunService:IsServer() then
 		local existing = script:FindFirstChild(id)
 		if existing then
-			if not RunService:IsRunning() then
+			if RunService:IsRunning() then
 				error(`Two events had the same id: {id}`)
 			else
 				-- prevents issues with being referenced by plugins like UI labs
